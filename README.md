@@ -13,17 +13,27 @@ This Repository is a BigData course project where we are finding the page rank o
     * [Link to  Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/tree/main/Venkata%20Gopi%20Siva%20Sai%20Nallapati)
     * [Link to wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Sai-Nallapati)
 
+* ### Sushma Nalla
+    * [Link to  Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/tree/main/Sushma%20Nalla)
+    * [Link to wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Sushma-Nalla)
 
+* ### Raghavendra Reddy
+    * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Raghavendra%20Reddy/README.md)
+    * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Raghavendra-Reddy)
 
+* ### Hemaanth Venkata Reddy Telluri
+    * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Hemanth%20Reddy%20Telluri/README.md)
+    * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Hemanth-Venkata-Reddy-Telluri)
 
+## Individual comments
+* ### Raghavendra Reddy
+This section will be used to write my comments
 
 
 
 
 
 * ### Sushma Nalla
-    * [Link to  Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/tree/main/Sushma%20Nalla)
-    * [Link to wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Sushma-Nalla)
 
 
 
@@ -31,11 +41,13 @@ This Repository is a BigData course project where we are finding the page rank o
 
 
 
-* ### Raghavendra Reddy
-    * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Raghavendra%20Reddy/README.md)
-    * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Raghavendra-Reddy)
+* ### Harshavardhan Kurra
 
 
+
+
+
+* ### Venkata Gopi Siva Sai Nallapati
 
 
 
@@ -45,5 +57,13 @@ This Repository is a BigData course project where we are finding the page rank o
 
 
 * ### Hemaanth Venkata Reddy Telluri
-    * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Hemanth%20Reddy%20Telluri/README.md)
-    * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Hemanth-Venkata-Reddy-Telluri)
+
+
+
+
+
+
+
+
+
+* ### Saikumar Mylavarapu
