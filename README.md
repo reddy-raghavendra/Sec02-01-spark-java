@@ -44,3 +44,6 @@ This Repository is a BigData course project where we are finding the page rank o
 
 
 
+* ### Hemaanth Venkata Reddy Telluri
+    * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Hemanth%20Reddy%20Telluri/README.md)
+    * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Hemanth-Venkata-Reddy-Telluri)
