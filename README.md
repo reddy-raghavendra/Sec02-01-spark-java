@@ -30,6 +30,10 @@ This Repository is a BigData course project where we are finding the page rank o
      * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Saikumar%20Mylavarapu/README.md)
      * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Saikumar-Mylavarapu)
 
+* ### Harshavardhan Kurra
+     * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Harshavardhan%20Kurra/README.md)
+     * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Harshavardhan-Kurra)
+
 ## Individual comments
 * ### Raghavendra Reddy
 This section will be used to write my comments
@@ -48,7 +52,7 @@ This section will be used to write my comments
 
 * ### Harshavardhan Kurra
 
-
+This is harshavardhan Kurra comment's section
 
 
 
