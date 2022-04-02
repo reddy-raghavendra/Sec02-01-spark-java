@@ -25,6 +25,10 @@ This Repository is a BigData course project where we are finding the page rank o
     * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Hemanth%20Reddy%20Telluri/README.md)
     * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Hemanth-Venkata-Reddy-Telluri)
 
+* ### Saikumar Mylavarapu
+     * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Saikumar%20Mylavarapu/README.md)
+     * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Saikumar-Mylavarapu)
+
 ## Individual comments
 * ### Raghavendra Reddy
 This section will be used to write my comments
@@ -67,3 +71,4 @@ This section will be used to write my comments
 
 
 * ### Saikumar Mylavarapu
+Comments Section 
