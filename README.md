@@ -1,5 +1,5 @@
 # Sec02-01-spark-java
-
+This Repository is a BigData course project where we are finding the page rank of a set of markdown pages using apache beam as a runner , apache spark as a data processor. We have used java SDK to do this.
 ## Collaborators
 * [Sushma Nalla](https://github.com/SushmaNalla)
 * [Raghavendra Reddy](https://github.com/reddy-raghavendra)
