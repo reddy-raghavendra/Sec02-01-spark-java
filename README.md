@@ -12,6 +12,7 @@ This Repository is a BigData course project where we are finding the page rank o
 * ### Venkata Gopi Siva Sai Nallapati
     * [Link to  Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/tree/main/Venkata%20Gopi%20Siva%20Sai%20Nallapati)
     * [Link to wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Sai-Nallapati)
+    * [Link to Commits](https://github.com/reddy-raghavendra/Sec02-01-spark-java/commits?author=NVGSSAI)
 
 * ### Sushma Nalla
     * [Link to  Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/tree/main/Sushma%20Nalla)
@@ -28,6 +29,10 @@ This Repository is a BigData course project where we are finding the page rank o
 * ### Saikumar Mylavarapu
      * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Saikumar%20Mylavarapu/README.md)
      * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Saikumar-Mylavarapu)
+
+* ### Harshavardhan Kurra
+     * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Harshavardhan%20Kurra/README.md)
+     * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Harshavardhan-Kurra)
 
 ## Individual comments
 * ### Raghavendra Reddy
@@ -47,12 +52,12 @@ This section will be used to write my comments
 
 * ### Harshavardhan Kurra
 
-
+This is harshavardhan Kurra comment's section
 
 
 
 * ### Venkata Gopi Siva Sai Nallapati
-
+This is my comment section
 
 
 
