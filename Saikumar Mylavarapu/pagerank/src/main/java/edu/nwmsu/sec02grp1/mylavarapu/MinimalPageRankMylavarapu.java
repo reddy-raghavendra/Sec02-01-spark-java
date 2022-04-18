@@ -17,6 +17,9 @@
  */
 package edu.nwmsu.sec02grp1.mylavarapu;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 // beam-playground:
 //   name: MinimalWordCount
 //   description: An example that counts words in Shakespeare's works.
@@ -33,10 +36,14 @@ import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Count;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Filter;
 import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.DoFn.Element;
+import org.apache.beam.sdk.transforms.DoFn.OutputReceiver;
+import org.apache.beam.sdk.transforms.DoFn.ProcessElement;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.TypeDescriptors;
 import org.apache.beam.sdk.values.PCollection;
@@ -46,6 +53,23 @@ import org.apache.beam.sdk.values.TypeDescriptor;
 
 public class MinimalPageRankMylavarapu {
 
+  static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankedPageMylavarapu>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankedPageMylavarapu>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+      ArrayList<VotingPageMylavarapu> voters = new ArrayList<VotingPageMylavarapu>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPageMylavarapu(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankedPageMylavarapu(element.getKey(), voters)));
+    }
+  }
   public static void main(String[] args) {
 
     PipelineOptions options = PipelineOptionsFactory.create();
