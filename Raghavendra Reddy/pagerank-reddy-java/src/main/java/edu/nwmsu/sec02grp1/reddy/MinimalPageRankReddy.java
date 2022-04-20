@@ -17,6 +17,7 @@
  */
 package edu.nwmsu.sec02grp1.reddy;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 // beam-playground:
@@ -44,6 +45,7 @@ import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
@@ -92,9 +94,8 @@ import io.grpc.netty.shaded.io.netty.handler.pcap.PcapWriteHandler;
  * file service.
  */
 
-
-public class MinimalPageRankReddy {
- // DEFINE DOFNS
+public class MinimalPageRankReddy{
+  // DEFINE DOFNS
   // ==================================================================
   // You can make your pipeline assembly code less verbose by defining
   // your DoFns statically out-of-line.
@@ -102,7 +103,6 @@ public class MinimalPageRankReddy {
   // as input of type InputT
   // and transforms it to OutputT.
   // We pass this DoFn to a ParDo in our pipeline.
-
   /**
    * DoFn Job1Finalizer takes KV(String, String List of outlinks) and transforms
    * the value into our custom RankedPage Value holding the page's rank and list
@@ -111,7 +111,7 @@ public class MinimalPageRankReddy {
    * The output of the Job1 Finalizer creates the initial input into our
    * iterative Job 2.
    */
- static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankedPageReddy>> {
+  static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankedPageReddy>> {
     @ProcessElement
     public void processElement(@Element KV<String, Iterable<String>> element,
         OutputReceiver<KV<String, RankedPageReddy>> receiver) {
@@ -134,57 +134,54 @@ public class MinimalPageRankReddy {
     PipelineOptions options = PipelineOptionsFactory.create();
     Pipeline p = Pipeline.create(options);
 
-// constant folder
+    // constant folder
     final String folderName = "web04";
-// Calling method with each files
-    PCollection<KV<String,String>> pColLinksGo = reddyPcolLinks(p, folderName, "go.md");    
-    PCollection<KV<String,String>> pColLinksJava = reddyPcolLinks(p, folderName, "java.md");    
-    PCollection<KV<String,String>> pColLinksPython = reddyPcolLinks(p, folderName, "python.md");    
-    PCollection<KV<String,String>> pColLinksReadme = reddyPcolLinks(p, folderName, "readme.md");    
-// Add all the PCollection to PCollection list
-    PCollectionList<KV<String,String>> pColList = PCollectionList.of(pColLinksGo).and(pColLinksJava).and(pColLinksPython).and(pColLinksReadme);
-// Merge all the key value lists to single list
-    PCollection<KV<String,String>> pColListMerged =  pColList.apply(Flatten.<KV<String,String>>pCollections());
-//group by key
-  PCollection<KV<String,Iterable<String>>> pColGroupByKey = pColListMerged.apply(GroupByKey.create());
-// Change the KV pairs to String using toString of kv 
-    PCollection<String> pColStringLists = pColGroupByKey.apply(
-      MapElements.into(
-        TypeDescriptors.strings()
-      ).via(
-        kvtoString -> kvtoString.toString()
-      )
-    );
-//Write the output to the file 
+    // Calling method with each files
+    PCollection<KV<String, String>> pColLinksGo = reddyPcolLinks(p, folderName, "go.md");
+    PCollection<KV<String, String>> pColLinksJava = reddyPcolLinks(p, folderName, "java.md");
+    PCollection<KV<String, String>> pColLinksPython = reddyPcolLinks(p, folderName, "python.md");
+    PCollection<KV<String, String>> pColLinksReadme = reddyPcolLinks(p, folderName, "readme.md");
+    // Add all the PCollection to PCollection list
+    PCollectionList<KV<String, String>> pColList = PCollectionList.of(pColLinksGo).and(pColLinksJava)
+        .and(pColLinksPython).and(pColLinksReadme);
+    // Merge all the key value lists to single list
+    PCollection<KV<String, String>> pColListMerged = pColList.apply(Flatten.<KV<String, String>>pCollections());
+    // group by key
+    PCollection<KV<String, Iterable<String>>> pColGroupByKey = pColListMerged.apply(GroupByKey.create());
+    // Convert to a custom Value object (RankedPage) in preparation for Job 2
+    PCollection<KV<String, RankedPageReddy>> job2in = pColGroupByKey.apply(ParDo.of(new Job1Finalizer()));
+
+    // Change the KV pairs to String using toString of kv
+    PCollection<String> pColStringLists = job2in.apply(
+        MapElements.into(
+            TypeDescriptors.strings()).via(
+                kvtoString -> kvtoString.toString()));
+    // Write the output to the file
     pColStringLists.apply(TextIO.write().to("PageRank-Reddy"));
 
     p.run().waitUntilFinish();
   }
 
-  private static PCollection<KV<String,String>> reddyPcolLinks(Pipeline p, final String folderName, final String fileName) {
-// Fetching the data from the destination
+  private static PCollection<KV<String, String>> reddyPcolLinks(Pipeline p, final String folderName,
+      final String fileName) {
+    // Fetching the data from the destination
     PCollection<String> pColInputLines = p.apply(TextIO.read().from(folderName + "/" + fileName));
-// taking the lines only which starts with [ 
+    // taking the lines only which starts with [
     PCollection<String> pColLinkLines = pColInputLines.apply(Filter.by((String line) -> line.startsWith("[")));
 
-//Take the outgoing links from the format []("") 
+    // Take the outgoing links from the format []("")
     PCollection<String> pColLinks = pColLinkLines.apply(
-      MapElements.into(
-        TypeDescriptors.strings()
-        )
-      .via(
-          (String linkLine) -> linkLine.substring(linkLine.indexOf("(")+1,linkLine.indexOf(")"))
-    ));
+        MapElements.into(
+            TypeDescriptors.strings())
+            .via(
+                (String linkLine) -> linkLine.substring(linkLine.indexOf("(") + 1, linkLine.indexOf(")"))));
 
-// Map the links with the file name passed to it
-    PCollection<KV<String,String>> pColkvs = pColLinks.apply(
-      MapElements.into(
-        TypeDescriptors.kvs(TypeDescriptors.strings(),TypeDescriptors.strings())
-      ).via(
-              outgoingLink -> KV.of(fileName,outgoingLink)
-      )
-    );
-//Return the KV pairs 
+    // Map the links with the file name passed to it
+    PCollection<KV<String, String>> pColkvs = pColLinks.apply(
+        MapElements.into(
+            TypeDescriptors.kvs(TypeDescriptors.strings(), TypeDescriptors.strings())).via(
+                outgoingLink -> KV.of(fileName, outgoingLink)));
+    // Return the KV pairs
     return pColkvs;
   }
 }
