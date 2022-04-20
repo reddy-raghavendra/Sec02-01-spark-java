@@ -3,6 +3,7 @@ C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\S
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\common\ExampleBigQueryTableOptions.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\DebuggingWordCount.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\complete\game\utils\GameConstants.java
+C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\edu\nwmsu\sec02grp1\mylavarapu\VotingPageMylavarapu.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\complete\game\StatefulTeamScore.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\subprocess\utils\FileUtils.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\WindowedWordCount.java
@@ -15,6 +16,7 @@ C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\S
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\complete\game\GameStats.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\complete\game\injector\InjectorUtils.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\complete\game\LeaderBoard.java
+C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\edu\nwmsu\sec02grp1\mylavarapu\RankedPageMylavarapu.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\common\ExampleOptions.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\edu\nwmsu\sec02grp1\mylavarapu\MinimalPageRankMylavarapu.java
 C:\Users\S542300\OneDrive - nwmissouri.edu\Documents\44517\Sec02-01-spark-java\Saikumar Mylavarapu\pagerank\src\main\java\org\apache\beam\examples\common\WriteOneFilePerWindow.java

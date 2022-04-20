@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.nwmsu.sec02grp1.Nallapati;
+package edu.nwmsu.sec02grp1.nalla;
 
 import java.util.ArrayList;
 
@@ -93,7 +93,7 @@ import io.grpc.netty.shaded.io.netty.handler.pcap.PcapWriteHandler;
  */
 
 
-public class MinimalPageRankNallapati {
+public class MinimalPageRankNalla {
  // DEFINE DOFNS
   // ==================================================================
   // You can make your pipeline assembly code less verbose by defining
@@ -111,21 +111,21 @@ public class MinimalPageRankNallapati {
    * The output of the Job1 Finalizer creates the initial input into our
    * iterative Job 2.
    */
- static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankedPageNallapati>> {
+ static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankedPageNalla>> {
     @ProcessElement
     public void processElement(@Element KV<String, Iterable<String>> element,
-        OutputReceiver<KV<StriNallapati>> receiver) {
+        OutputReceiver<KV<String, RankedPageNalla>> receiver) {
       Integer contributorVotes = 0;
       if (element.getValue() instanceof Collection) {
         contributorVotes = ((Collection<String>) element.getValue()).size();
       }
-      ArrayList<VotingPageNallapati> voters = new ArrayList<VotingPageNallapati>();
+      ArrayList<VotingPageNalla> voters = new ArrayList<VotingPageNalla>();
       for (String voterName : element.getValue()) {
         if (!voterName.isEmpty()) {
-          voters.add(new VotingPageNallapati(voterName, contributorVotes));
+          voters.add(new VotingPageNalla(voterName, contributorVotes));
         }
       }
-      receiver.output(KV.of(element.getKey(), Nallapati(element.getKey(), voters)));
+      receiver.output(KV.of(element.getKey(), new RankedPageNalla(element.getKey(), voters)));
     }
   }
 
@@ -137,10 +137,10 @@ public class MinimalPageRankNallapati {
 // constant folder
     final String folderName = "web04";
 // Calling method with each files
-    PCollection<KV<String,String>> pColLinksGo = nallapatiPcolLinks(p, folderName, "go.md");    
-    PCollection<KV<String,String>> pColLinksJava = nallapatiPcolLinks(p, folderName, "java.md");    
-    PCollection<KV<String,String>> pColLinksPython = nallapatiPcolLinks(p, folderName, "python.md");    
-    PCollection<KV<String,String>> pColLinksReadme = nallapatiPcolLinks(p, folderName, "readme.md");    
+    PCollection<KV<String,String>> pColLinksGo = nallaPcolLinks(p, folderName, "go.md");    
+    PCollection<KV<String,String>> pColLinksJava = nallaPcolLinks(p, folderName, "java.md");    
+    PCollection<KV<String,String>> pColLinksPython = nallaPcolLinks(p, folderName, "python.md");    
+    PCollection<KV<String,String>> pColLinksReadme = nallaPcolLinks(p, folderName, "readme.md");    
 // Add all the PCollection to PCollection list
     PCollectionList<KV<String,String>> pColList = PCollectionList.of(pColLinksGo).and(pColLinksJava).and(pColLinksPython).and(pColLinksReadme);
 // Merge all the key value lists to single list
@@ -156,12 +156,12 @@ public class MinimalPageRankNallapati {
       )
     );
 //Write the output to the file 
-    pColStringLists.apply(TextIO.write().to("PageRank-Nallapati"));
+    pColStringLists.apply(TextIO.write().to("PageRank-nalla"));
 
     p.run().waitUntilFinish();
   }
 
-  private static PCollection<KV<String,String>> NallapatiPcolLinks(Pipeline p, final String folderName, final String fileName) {
+  private static PCollection<KV<String,String>> nallaPcolLinks(Pipeline p, final String folderName, final String fileName) {
 // Fetching the data from the destination
     PCollection<String> pColInputLines = p.apply(TextIO.read().from(folderName + "/" + fileName));
 // taking the lines only which starts with [ 
