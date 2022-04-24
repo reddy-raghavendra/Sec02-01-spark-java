@@ -129,6 +129,61 @@ public class MinimalPageRankReddy{
     }
   }
 
+  static class Job2Mapper extends DoFn<KV<String, RankedPageReddy>, KV<String, RankedPageReddy>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, RankedPageReddy> element,
+      OutputReceiver<KV<String, RankedPageReddy>> receiver) {
+      int votes = 0;
+      ArrayList<VotingPageReddy> voters = element.getValue().getVoterList();
+      if(voters instanceof Collection){
+        votes = ((Collection<VotingPageReddy>) voters).size();
+      }
+      for(VotingPageReddy vp: voters){
+        String pageName = vp.getVoterName();
+        double pageRank = vp.getPageRank();
+        String contributingPageName = element.getKey();
+        double contributingPageRank = element.getValue().getRank();
+        VotingPageReddy contributor = new VotingPageReddy(contributingPageName,votes,contributingPageRank);
+        ArrayList<VotingPageReddy> arr = new ArrayList<>();
+        arr.add(contributor);
+        receiver.output(KV.of(vp.getVoterName(), new RankedPageReddy(pageName, pageRank, arr)));        
+      }
+    }
+  }
+
+  static class Job2Updater extends DoFn<KV<String, Iterable<RankedPageReddy>>, KV<String, RankedPageReddy>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<RankedPageReddy>> element,
+      OutputReceiver<KV<String, RankedPageReddy>> receiver) {
+        Double dampingFactor = 0.85;
+        Double updatedRank = (1 - dampingFactor);
+        ArrayList<VotingPageReddy> newVoters = new ArrayList<>();
+        for(RankedPageReddy rankPage:element.getValue()){
+          if (rankPage != null) {
+            for(VotingPageReddy votingPage:rankPage.getVoterList()){
+              newVoters.add(votingPage);
+              updatedRank += (dampingFactor) * votingPage.getPageRank() / (double)votingPage.getContributorVotes();
+              // newVoters.add(new VotingPageReddy(votingPage.getVoterName(),votingPage.getContributorVotes(),updatedRank));
+            }
+          }
+        }
+        receiver.output(KV.of(element.getKey(),new RankedPageReddy(element.getKey(), updatedRank, newVoters)));
+
+    }
+
+  }
+
+  // static class Job2 extends DoFn<KV<String, RankedPageReddy>, KV<String, RankedPageReddy>>{
+  //   @ProcessElement
+  //    public void processElement(@Element KV<String, RankedPageReddy> element,
+  //     OutputReceiver<KV<String, RankedPageReddy>> receiver){
+  //       PCollection<KV<String,RankedPageReddy>> job2Mapper = element.getKey().apply(ParDo.of(new Job2Mapper()));
+
+  //       PCollection<KV<String,Iterable<RankedPageReddy>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
+    
+  //       PCollection<KV<String, RankedPageReddy>> job2Updater = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+  //   }
+  // }
   public static void main(String[] args) {
 
     PipelineOptions options = PipelineOptionsFactory.create();
@@ -150,13 +205,66 @@ public class MinimalPageRankReddy{
     PCollection<KV<String, Iterable<String>>> pColGroupByKey = pColListMerged.apply(GroupByKey.create());
     // Convert to a custom Value object (RankedPage) in preparation for Job 2
     PCollection<KV<String, RankedPageReddy>> job2in = pColGroupByKey.apply(ParDo.of(new Job1Finalizer()));
+  //Job 1 results 
+  // KV{java.md, java.md<1.0,[[voterName = README.md, Page rank = 1.0 ContributorVotes = 1]]>}
+  // KV{python.md, python.md<1.0,[[voterName = README.md, Page rank = 1.0 ContributorVotes = 1]]>}
+  // KV{readme.md, readme.md<1.0,[[voterName = go.md, Page rank = 1.0 ContributorVotes = 3], [voterName = java.md, Page rank = 1.0 ContributorVotes = 3], [voterName = python.md, Page rank = 1.0 ContributorVotes = 3]]>}
+  // KV{go.md, go.md<1.0,[[voterName = README.md, Page rank = 1.0 ContributorVotes = 1]]>}
+    PCollection<KV<String,RankedPageReddy>> job2Mapper = job2in.apply(ParDo.of(new Job2Mapper()));
+  //Job 2 mapper results 
+  // KV{README.md, README.md<1.0,[voterName = go.md, Page rank = 1.0 ContributorVotes = 1]>}
+  // KV{README.md, README.md<1.0,[voterName = python.md, Page rank = 1.0 ContributorVotes = 1]>}
+  // KV{README.md, README.md<1.0,[voterName = java.md, Page rank = 1.0 ContributorVotes = 1]>}  
+  // KV{go.md, go.md<1.0,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
+  // KV{python.md, python.md<1.0,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
+  // KV{java.md, java.md<1.0,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
+
+  PCollection<KV<String, RankedPageReddy>> job2out = null; 
+  PCollection<KV<String,Iterable<RankedPageReddy>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
+    
+  job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+
+  // Job2 results 1st iteration
+  // KV{README.md, README.md<2.7,[voterName = java.md, Page rank = 1.0 ContributorVotes = 1, voterName = python.md, Page rank = 1.0 ContributorVotes = 1, voterName = go.md, Page rank = 1.0 ContributorVotes = 1]>}
+  // KV{java.md, java.md<0.43333333333333335,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
+  // KV{go.md, go.md<0.43333333333333335,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
+  // KV{python.md, python.md<0.43333333333333335,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
+  job2MapperGrpByKey = job2out.apply(GroupByKey.create());
+    
+  job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+  // Job2 results 1st iteration
+  // KV{java.md, java.md<0.2727777777777778,[voterName = readme.md, Page rank = 0.2727777777777778 ContributorVotes = 3]>}
+  // KV{go.md, go.md<0.2727777777777778,[voterName = readme.md, Page rank = 0.2727777777777778 ContributorVotes = 3]>}
+  // KV{python.md, python.md<0.2727777777777778,[voterName = readme.md, Page rank = 0.2727777777777778 ContributorVotes = 3]>}
+  // KV{README.md, README.md<4.8675,[voterName = java.md, Page rank = 1.0 ContributorVotes = 1, voterName = python.md, Page rank = 2.5725 ContributorVotes = 1, voterName = go.md, Page rank = 4.8675 ContributorVotes = 1]>}
+  job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+  job2MapperGrpByKey = job2out.apply(GroupByKey.create());    
+  job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));   
+    // PCollection<KV<String, RankedPageReddy>> job2out = null; 
+    // int iterations = 40;
+    // for (int i = 1; i <= iterations; i++) {
+    //   // use job2in to calculate job2 out
+    //   PCollection<KV<String, RankedPageReddy>> job2in = pColGroupByKey.apply(ParDo.of(new Job1Finalizer()));
+
+    //   PCollection<KV<String,RankedPageReddy>> job2Mapper = job2in.apply(ParDo.of(new Job2Mapper()));
+  
+    //   PCollection<KV<String,Iterable<RankedPageReddy>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
+  
+    //    job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+    //   // update job2in so it equals the new job2out
+    //     job2in = job2out;
+    // }
+   
+   
 
     // Change the KV pairs to String using toString of kv
-    PCollection<String> pColStringLists = job2in.apply(
+    PCollection<String> pColStringLists = job2out.apply(
         MapElements.into(
             TypeDescriptors.strings()).via(
                 kvtoString -> kvtoString.toString()));
     // Write the output to the file
+
+
     pColStringLists.apply(TextIO.write().to("PageRank-Reddy"));
 
     p.run().waitUntilFinish();

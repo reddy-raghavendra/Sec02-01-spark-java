@@ -19,6 +19,7 @@ This Repository is a BigData course project where we are finding the page rank o
     * [Link to wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Sushma-Nalla)
 
 * ### Raghavendra Reddy
+    * ![my image](https://media-exp1.licdn.com/dms/image/C5603AQH4GSd0J57Zag/profile-displayphoto-shrink_400_400/0/1648489753605?e=1656547200&v=beta&t=ovpNpcl5M0h-urCUuQFvAZ8oTs5LkJh52n7vkvYt7rA)
     * [Link to Folder Readme](https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/Raghavendra%20Reddy/README.md)
     * [Link to Wiki](https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Raghavendra-Reddy)
 
