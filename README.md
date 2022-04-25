@@ -73,8 +73,11 @@ Spark Framework is a simple and expressive Java/Kotlin web framework DSL built f
 
 
 * ### Harshavardhan Kurra
-
-This is harshavardhan Kurra comment's section
+    * Added my individual folder and readme in the project.
+    * For finding the pagerank i have created pagerank file to find the links on each page.<br>
+    * Created wiki and readme for my individual folder.<br>
+    * Added two java classes VotingPageKurra and RankedPageKurra.<br>
+    * Used the pagerank formula to find the pagerank of the pages.<br>
 
 
 
