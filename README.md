@@ -24,7 +24,7 @@ Spark Framework is a simple and expressive Java/Kotlin web framework DSL built f
 * [Venkata Gopi Siva Sai Nallapati](https://github.com/NVGSSAI)<br>
    <img src="https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/images/WhatsApp%20Image%202022-04-24%20at%2011.19.24%20PM%20(1).jpeg" height="200" width="200">
 * [Saikumar Mylavarapu](https://github.com/saikumar438)<br>
-   <img src="https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/images/IMG-6254.jpg">
+   <img src="https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/images/Capture.PNG" width = "200" height="250">
 
 ## Wiki Pages and Folder Links
 * ### Venkata Gopi Siva Sai Nallapati
