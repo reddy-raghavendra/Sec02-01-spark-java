@@ -37,8 +37,12 @@ This Repository is a BigData course project where we are finding the page rank o
 
 ## Individual comments
 * ### Raghavendra Reddy
-This section will be used to write my comments
 
+   * Created a PageRank file name which reads the links on each page and finds the rank of the pages.
+   * There are two jobs created, the first job maps the pages to outgoing links with initial rank.
+   * Used custom classes for ranks and votes to store the data
+   * The second job mapper takes the voters from the first job and maps individually.
+   * Job 2 updater finds the page rank using the page rank formulla
 
 
 
