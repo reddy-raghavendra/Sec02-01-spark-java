@@ -93,7 +93,6 @@ I have Added 2 more java files NallapatiVotingPage and NallapatiRanked Page.<br>
 * ### Saikumar Mylavarapu
    * Created a folder with my name.
    * Created a wiki page with my name and have added my issues.
-   * Created a PageRank file name which reads the links on each page and finds the rank of the pages.
    * Created a page rank project with java, which reads the pages from the web04 directory.
    * Created a PageRank file name which reads the links on each page and finds the rank of the pages.
    * Added VotingPage and RankedPage java files.
