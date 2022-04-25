@@ -1,5 +1,11 @@
 # Sec02-01-spark-java
 This Repository is a BigData course project where we are finding the page rank of a set of markdown pages using apache beam as a runner , apache spark as a data processor. We have used java SDK to do this.
+## Description
+This big data project is to develop Google Page Rank System using spark with java.
+## Spark Java
+Spark Framework is a simple and expressive Java/Kotlin web framework DSL built for rapid development. Sparks intention is to provide an alternative for Kotlin/Java developers that want to develop their web applications as expressive as possible and with minimal boilerplate. With a clear philosophy Spark is designed not only to make you more productive, but also to make your code better under the influence of Spark’s sleek, declarative and expressive syntax.
+## Page Rank
+PageRank works by counting the number and quality of links to a page to determine a rough estimate of how important the website is. The underlying assumption is that more important websites are likely to receive more links from other websites.
 ## Collaborators
 * [Sushma Nalla](https://github.com/SushmaNalla)
 * [Raghavendra Reddy](https://github.com/reddy-raghavendra)
@@ -62,12 +68,11 @@ This is harshavardhan Kurra comment's section
 
 
 * ### Venkata Gopi Siva Sai Nallapati
-Link to Workspace:https://github.com/reddy-raghavendra/Sec02-01-spark-java/tree/main/Venkata%20Gopi%20Siva%20Sai%20Nallapati/java-word-count-beam
-Link to Wiki:https://github.com/reddy-raghavendra/Sec02-01-spark-java/wiki/Sai-Nallapati
-Edited wiki page and readme
-Created a Custom Java Maven Project For finding the Page Rank
-Added a Custom Java file for finding the page rank
-Added 2 more java files VotingPage and Ranked Page
+I have added my own folder and space in the readme.<br>
+I have worked on creating Wiki pages and modified readme details.<br>
+I have Created a Custom Java Maven Project For finding the Page Rank.<br>
+I have Added a Custom Java file (MinimalPageRankNallapati) for finding the page rank.<br>
+I have Added 2 more java files NallapatiVotingPage and NallapatiRanked Page.<br>
 
 
 
