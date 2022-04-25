@@ -1,14 +1,22 @@
 # Sec02-01-spark-java
-This Repository is a BigData course project where we are finding the page rank of a set of markdown pages using apache beam as a runner , apache spark as a data processor. We have used java SDK to do this.
-## Description
-This big data project is to develop Google Page Rank System using spark with java.
+This Repository is a BigData course project where we are finding the page rank of a set of markdown pages using apache beam as a runner , apache spark as a data processor.
+## What is Page Rank?
+PageRank is one of the methods Google uses to determine a page’s relevance or importance. PageRank works by counting the number and quality of links to a page to determine a rough estimate of how important the website is. The underlying assumption is that more important websites are likely to receive more links from other websites.It is only one part of the story when it comes to the Google listing, but the other aspects are discussed elsewhere (and are ever changing) and PageRank is interesting enough to deserve a paper of its own.
+Page Rank is a topic much discussed by Search Engine Optimisation (SEO) experts. At the heart of PageRank is a mathematical formula that seems scary to look at but is actually fairly simple to understand.
+## How is it implemented?
+*PageRank extends this idea by not counting links from all pages equally, and by normalizing by the number of links on a page. PageRank is defined as follows:
+We assume page A has pages T1...Tn which point to it (i.e., are citations). The parameter d is a damping factor which can be set between 0 and 1. We usually set d to 0.85. There are more details about d in the next section. Also C(A) is defined as the number of links going out of page A. The PageRank of a page A is given as follows:*
+>PR(A) = (1-d) + d (PR(T1)/C(T1) + ... + PR(Tn)/C(Tn))
+
+*Note that the PageRanks form a probability distribution over web pages, so the sum of all web pages' PageRanks will be one.*
+
 ## Spark Java
 Spark Framework is a simple and expressive Java/Kotlin web framework DSL built for rapid development. Sparks intention is to provide an alternative for Kotlin/Java developers that want to develop their web applications as expressive as possible and with minimal boilerplate. With a clear philosophy Spark is designed not only to make you more productive, but also to make your code better under the influence of Spark’s sleek, declarative and expressive syntax.
-## Page Rank
-PageRank works by counting the number and quality of links to a page to determine a rough estimate of how important the website is. The underlying assumption is that more important websites are likely to receive more links from other websites.
+
 ## Collaborators
 * [Sushma Nalla](https://github.com/SushmaNalla)
-* [Raghavendra Reddy](https://github.com/reddy-raghavendra)
+* [Raghavendra Reddy](https://github.com/reddy-raghavendra)  
+   <img src="https://media-exp1.licdn.com/dms/image/C5603AQH4GSd0J57Zag/profile-displayphoto-shrink_400_400/0/1648489753605?e=1656547200&v=beta&t=ovpNpcl5M0h-urCUuQFvAZ8oTs5LkJh52n7vkvYt7rA" width="200" height="200">
 * [Harshavardhan Kurra](https://github.com/harshakurra123)
 * [Hemanth Reddy Telluri](https://github.com/hemanth8056)
 * [Venkata Gopi Siva Sai Nallapati](https://github.com/NVGSSAI)
