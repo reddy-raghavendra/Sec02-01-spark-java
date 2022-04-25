@@ -83,11 +83,11 @@ Spark Framework is a simple and expressive Java/Kotlin web framework DSL built f
 
 
 * ### Venkata Gopi Siva Sai Nallapati
-I have added my own folder and space in the readme.<br>
-I have worked on creating Wiki pages and modified readme details.<br>
-I have Created a Custom Java Maven Project For finding the Page Rank.<br>
-I have Added a Custom Java file (MinimalPageRankNallapati) for finding the page rank.<br>
-I have Added 2 more java files NallapatiVotingPage and NallapatiRanked Page.<br>
+    * I have added my own folder and space in the readme.<br>
+    * I have worked on creating Wiki pages and modified readme details.<br>
+    * I have Created a Custom Java Maven Project For finding the Page Rank.<br>
+    * I have Added a Custom Java file (MinimalPageRankNallapati) for finding the page rank.<br>
+    * I have Added 2 more java files NallapatiVotingPage and NallapatiRanked Page.<br>
 
 
 
