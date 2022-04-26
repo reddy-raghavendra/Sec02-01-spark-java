@@ -64,8 +64,6 @@ Spark Framework is a simple and expressive Java/Kotlin web framework DSL built f
    * Job 2 updater finds the page rank using the page rank formulla
 
 
-
-
 * ### Sushma Nalla
 
    * I have Added my individual folder and readme in the project.
@@ -73,10 +71,6 @@ Spark Framework is a simple and expressive Java/Kotlin web framework DSL built f
    * To find the pagerank i have created the pagerank file to find the links on each page.
    * I have added the two java classes VotingPageNalla and RankedPageNalla.
    * Completed Job1 finalizer, job2 updater and mapper.
-
-
-
-
 
 
 
