@@ -16,7 +16,9 @@ We assume page A has pages T1...Tn which point to it (i.e., are citations). The 
 Spark Framework is a simple and expressive Java/Kotlin web framework DSL built for rapid development. Sparks intention is to provide an alternative for Kotlin/Java developers that want to develop their web applications as expressive as possible and with minimal boilerplate. With a clear philosophy Spark is designed not only to make you more productive, but also to make your code better under the influence of Spark’s sleek, declarative and expressive syntax.
 
 ## Collaborators
+
 * [Sushma Nalla](https://github.com/SushmaNalla)
+
     <img src="https://github.com/reddy-raghavendra/Sec02-01-spark-java/blob/main/images/Sushma%20(2).jpeg" height="200" width="200">
 * [Raghavendra Reddy](https://github.com/reddy-raghavendra)  
    <img src="https://media-exp1.licdn.com/dms/image/C5603AQH4GSd0J57Zag/profile-displayphoto-shrink_400_400/0/1648489753605?e=1656547200&v=beta&t=ovpNpcl5M0h-urCUuQFvAZ8oTs5LkJh52n7vkvYt7rA" height="200" width="200">
