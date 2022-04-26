@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class RankedPageReddy implements Serializable{
     String voter;
-    double rank;
+    double rank = 1.0;
     ArrayList<VotingPageReddy> voterList = new ArrayList<>();
     
     public RankedPageReddy(String voter,double rank, ArrayList<VotingPageReddy> voters){
@@ -16,7 +16,6 @@ public class RankedPageReddy implements Serializable{
     public RankedPageReddy(String voter, ArrayList<VotingPageReddy> voters){
         this.voter = voter;
         this.voterList = voters;
-        this.rank = 1.0;
     }    
     
     public String getVoter() {
