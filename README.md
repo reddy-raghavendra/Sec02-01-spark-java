@@ -64,6 +64,9 @@ Spark Framework is a simple and expressive Java/Kotlin web framework DSL built f
    * Used custom classes for ranks and votes to store the data
    * The second job mapper takes the voters from the first job and maps individually.
    * Job 2 updater finds the page rank using the page rank formulla
+   * In Job 3 mapped the ranked pages as KV pairs with Rank of a page as a key with data type double and values as page name.
+   * Once you have all the pages with format KV<Double,String>, need to get the maximum KV pair.
+   * To do that I have made use of Combine transform. I have used stack over flow answer [get maximum KV pair](https://stackoverflow.com/questions/51274106/finding-the-key-with-maximum-value-in-a-pcollection-of-key-value-pairs)
 
 
 * ### Sushma Nalla

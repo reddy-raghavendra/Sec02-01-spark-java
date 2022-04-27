@@ -38,6 +38,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Filter;
@@ -45,6 +46,7 @@ import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.Max;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
@@ -94,7 +96,7 @@ import io.grpc.netty.shaded.io.netty.handler.pcap.PcapWriteHandler;
  * file service.
  */
 
-public class MinimalPageRankReddy{
+public class MinimalPageRankReddy {
   // DEFINE DOFNS
   // ==================================================================
   // You can make your pipeline assembly code less verbose by defining
@@ -132,21 +134,21 @@ public class MinimalPageRankReddy{
   static class Job2Mapper extends DoFn<KV<String, RankedPageReddy>, KV<String, RankedPageReddy>> {
     @ProcessElement
     public void processElement(@Element KV<String, RankedPageReddy> element,
-      OutputReceiver<KV<String, RankedPageReddy>> receiver) {
+        OutputReceiver<KV<String, RankedPageReddy>> receiver) {
       int votes = 0;
       ArrayList<VotingPageReddy> voters = element.getValue().getVoterList();
-      if(voters instanceof Collection){
+      if (voters instanceof Collection) {
         votes = ((Collection<VotingPageReddy>) voters).size();
       }
-      for(VotingPageReddy vp: voters){
+      for (VotingPageReddy vp : voters) {
         String pageName = vp.getVoterName();
         double pageRank = vp.getPageRank();
         String contributingPageName = element.getKey();
         double contributingPageRank = element.getValue().getRank();
-        VotingPageReddy contributor = new VotingPageReddy(contributingPageName,votes,contributingPageRank);
+        VotingPageReddy contributor = new VotingPageReddy(contributingPageName, votes, contributingPageRank);
         ArrayList<VotingPageReddy> arr = new ArrayList<>();
         arr.add(contributor);
-        receiver.output(KV.of(vp.getVoterName(), new RankedPageReddy(pageName, pageRank, arr)));        
+        receiver.output(KV.of(vp.getVoterName(), new RankedPageReddy(pageName, pageRank, arr)));
       }
     }
   }
@@ -154,43 +156,49 @@ public class MinimalPageRankReddy{
   static class Job2Updater extends DoFn<KV<String, Iterable<RankedPageReddy>>, KV<String, RankedPageReddy>> {
     @ProcessElement
     public void processElement(@Element KV<String, Iterable<RankedPageReddy>> element,
-      OutputReceiver<KV<String, RankedPageReddy>> receiver) {
-        Double dampingFactor = 0.85;
-        Double updatedRank = (1 - dampingFactor);
-        ArrayList<VotingPageReddy> newVoters = new ArrayList<>();
-        for(RankedPageReddy rankPage:element.getValue()){
-          if (rankPage != null) {
-            for(VotingPageReddy votingPage:rankPage.getVoterList()){
-              newVoters.add(votingPage);
-              updatedRank += (dampingFactor) * votingPage.getPageRank() / (double)votingPage.getContributorVotes();
-            }
+        OutputReceiver<KV<String, RankedPageReddy>> receiver) {
+      Double dampingFactor = 0.85;
+      Double updatedRank = (1 - dampingFactor);
+      ArrayList<VotingPageReddy> newVoters = new ArrayList<>();
+      for (RankedPageReddy rankPage : element.getValue()) {
+        if (rankPage != null) {
+          for (VotingPageReddy votingPage : rankPage.getVoterList()) {
+            newVoters.add(votingPage);
+            updatedRank += (dampingFactor) * votingPage.getPageRank() / (double) votingPage.getContributorVotes();
           }
         }
-        receiver.output(KV.of(element.getKey(),new RankedPageReddy(element.getKey(), updatedRank, newVoters)));
+      }
+      receiver.output(KV.of(element.getKey(), new RankedPageReddy(element.getKey(), updatedRank, newVoters)));
 
     }
 
   }
 
-  // static class Job2 extends DoFn<KV<String, RankedPageReddy>, KV<String, RankedPageReddy>>{
-  //   @ProcessElement
-  //    public void processElement(@Element KV<String, RankedPageReddy> element,
-  //     OutputReceiver<KV<String, RankedPageReddy>> receiver){
-  //       PCollection<KV<String,RankedPageReddy>> job2Mapper = element.getKey().apply(ParDo.of(new Job2Mapper()));
+  // static class Job2 extends DoFn<KV<String, RankedPageReddy>, KV<String,
+  // RankedPageReddy>>{
+  // @ProcessElement
+  // public void processElement(@Element KV<String, RankedPageReddy> element,
+  // OutputReceiver<KV<String, RankedPageReddy>> receiver){
+  // PCollection<KV<String,RankedPageReddy>> job2Mapper =
+  // element.getKey().apply(ParDo.of(new Job2Mapper()));
 
-  //       PCollection<KV<String,Iterable<RankedPageReddy>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
-    
-  //       PCollection<KV<String, RankedPageReddy>> job2Updater = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
-  //   }
+  // PCollection<KV<String,Iterable<RankedPageReddy>>> job2MapperGrpByKey =
+  // job2Mapper.apply(GroupByKey.create());
+
+  // PCollection<KV<String, RankedPageReddy>> job2Updater =
+  // job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+  // }
   // }
 
-  static class Job3 extends DoFn<KV<String, RankedPageReddy>, KV<Double, String>>{
+  static class Job3 extends DoFn<KV<String, RankedPageReddy>, KV<Double, String>> {
     @ProcessElement
-     public void processElement(@Element KV<String, RankedPageReddy> element,
-      OutputReceiver<KV<Double, String>> receiver){
-        receiver.output(KV.of(element.getValue().getRank(),element.getKey()));
+    public void processElement(@Element KV<String, RankedPageReddy> element,
+        OutputReceiver<KV<Double, String>> receiver) {
+      double maxRank = Integer.MIN_VALUE;
+      receiver.output(KV.of(element.getValue().getRank(), element.getKey()));
     }
   }
+
   public static void main(String[] args) {
 
     PipelineOptions options = PipelineOptionsFactory.create();
@@ -213,28 +221,29 @@ public class MinimalPageRankReddy{
     // Convert to a custom Value object (RankedPage) in preparation for Job 2
     PCollection<KV<String, RankedPageReddy>> job2in = pColGroupByKey.apply(ParDo.of(new Job1Finalizer()));
 
-    PCollection<KV<String, RankedPageReddy>> job2out = null; 
+    PCollection<KV<String, RankedPageReddy>> job2out = null;
     int iterations = 40;
     for (int i = 1; i <= iterations; i++) {
       // use job2in to calculate job2 out
-      PCollection<KV<String,RankedPageReddy>> job2Mapper = job2in.apply(ParDo.of(new Job2Mapper()));
-  
-      PCollection<KV<String,Iterable<RankedPageReddy>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
-  
+      PCollection<KV<String, RankedPageReddy>> job2Mapper = job2in.apply(ParDo.of(new Job2Mapper()));
+
+      PCollection<KV<String, Iterable<RankedPageReddy>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
+
       job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
       // update job2in so it equals the new job2out
       job2in = job2out;
     }
-    
-    // PColljob2in.apply(ParDo.of(new Job3()));
-  
+
+    PCollection<KV<Double, String>> job3 = job2out.apply(ParDo.of(new Job3()));
+
+    PCollection<KV<Double, String>> maxRank = job3.apply(Combine.globally(Max.of(new RankedPageReddy())));
+    // Combine.globally(Max.of(job3));
     // Change the KV pairs to String using toString of kv
-    PCollection<String> pColStringLists = job2out.apply(
+    PCollection<String> pColStringLists = maxRank.apply(
         MapElements.into(
             TypeDescriptors.strings()).via(
                 kvtoString -> kvtoString.toString()));
     // Write the output to the file
-
 
     pColStringLists.apply(TextIO.write().to("PageRank-Reddy"));
 
