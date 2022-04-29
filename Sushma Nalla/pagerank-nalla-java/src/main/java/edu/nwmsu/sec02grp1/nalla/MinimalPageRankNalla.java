@@ -37,6 +37,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Filter;
@@ -44,6 +45,7 @@ import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.Max;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
@@ -216,7 +218,11 @@ public class MinimalPageRankNalla {
       job2in = job2out;
     }
     // PColljob2in.apply(ParDo.of(new Job3()));
-  
+      // Call job 3 to get the results in format <Rank(Double),Rank page name(String)>
+      PCollection<KV<Double, String>> job3 = job2out.apply(ParDo.of(new Job3()));
+
+      // Get the maximum value using Combine transform which required comparator implemented class instance as a parameter
+      PCollection<KV<Double, String>> maxRank = job3.apply(Combine.globally(Max.of(new RankedPageNalla())));
     // Change the KV pairs to String using toString of kv
     PCollection<String> pColStringLists = job2out.apply(
         MapElements.into(

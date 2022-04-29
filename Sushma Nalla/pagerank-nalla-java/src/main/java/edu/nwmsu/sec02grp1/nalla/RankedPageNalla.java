@@ -16,7 +16,11 @@ public class RankedPageNalla implements Serializable {
     public RankedPageNalla(String voter, ArrayList<VotingPageNalla> voters){
         this.voter = voter;
         this.voterList = voters;
-    }    
+    }  
+    public RankedPageNalla() {
+        voter = "";
+        rank = 0.0;
+    }  
     
     public String getVoter() {
         return voter;
