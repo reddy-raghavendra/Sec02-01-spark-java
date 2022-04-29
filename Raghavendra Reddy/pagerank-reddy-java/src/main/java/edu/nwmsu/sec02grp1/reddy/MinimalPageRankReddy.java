@@ -174,22 +174,6 @@ public class MinimalPageRankReddy {
 
   }
 
-  // static class Job2 extends DoFn<KV<String, RankedPageReddy>, KV<String,
-  // RankedPageReddy>>{
-  // @ProcessElement
-  // public void processElement(@Element KV<String, RankedPageReddy> element,
-  // OutputReceiver<KV<String, RankedPageReddy>> receiver){
-  // PCollection<KV<String,RankedPageReddy>> job2Mapper =
-  // element.getKey().apply(ParDo.of(new Job2Mapper()));
-
-  // PCollection<KV<String,Iterable<RankedPageReddy>>> job2MapperGrpByKey =
-  // job2Mapper.apply(GroupByKey.create());
-
-  // PCollection<KV<String, RankedPageReddy>> job2Updater =
-  // job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
-  // }
-  // }
-
   static class Job3 extends DoFn<KV<String, RankedPageReddy>, KV<Double, String>> {
     @ProcessElement
     public void processElement(@Element KV<String, RankedPageReddy> element,
@@ -234,17 +218,19 @@ public class MinimalPageRankReddy {
       job2in = job2out;
     }
 
+    // Call job 3 to get the results in format <Rank(Double),Rank page name(String)>
     PCollection<KV<Double, String>> job3 = job2out.apply(ParDo.of(new Job3()));
 
+    // Get the maximum value using Combine transform which required comparator implemented class instance as a parameter
     PCollection<KV<Double, String>> maxRank = job3.apply(Combine.globally(Max.of(new RankedPageReddy())));
-    // Combine.globally(Max.of(job3));
-    // Change the KV pairs to String using toString of kv
+    
+    // Convert KV() to string before writing to the file
     PCollection<String> pColStringLists = maxRank.apply(
         MapElements.into(
             TypeDescriptors.strings()).via(
                 kvtoString -> kvtoString.toString()));
-    // Write the output to the file
 
+    // Write the output to the file
     pColStringLists.apply(TextIO.write().to("PageRank-Reddy"));
 
     p.run().waitUntilFinish();

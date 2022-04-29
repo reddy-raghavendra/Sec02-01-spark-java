@@ -86,20 +86,6 @@ public class RankedPageReddy implements Serializable, Comparator<KV<Double,Strin
         return this.rank;
     }
 
-    // @Override
-    // public int compare(Object o1, Object o2) {
-    
-    // double rank1 = ((RankedPageReddy)o1).getRank();
-    // double rank2 = ((RankedPageReddy)o2).getRank();
-    // if (rank1 > rank2) {
-    //     return 1;
-    // } else if(rank1 < rank2) {
-    //     return -1;
-    // }else{
-    //     return 0;
-    // }
-    // }
-
     @Override
     public int compare(KV<Double, String> o1, KV<Double, String> o2) {
         double rank1 = o1.getKey();
