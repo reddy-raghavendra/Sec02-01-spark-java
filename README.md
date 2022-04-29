@@ -102,6 +102,11 @@ Spark Framework is a simple and expressive Java/Kotlin web framework DSL built f
 
 
 * ### Hemaanth Venkata Reddy Telluri
+     * Created a folder with my name.
+     * Created a wiki page with my name and have added my issues.
+     * Created a page rank project with java, which reads the pages from the web04 directory.
+     * Created a PageRank file name which reads the links on each page and finds the rank of the pages.
+     * Added VotingPage and RankedPage java files.
 
 
 
