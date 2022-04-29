@@ -31,3 +31,5 @@ mvn compile exec:java -D exec.mainClass=edu.nwmsu.sec02grp1.nalla.MinimalPageRan
 
 I have completed the Job1 and Job1Finilizer till now, Now working on Job2Mapper method.
 Completed Job02 and Job 03
+
+I have completed both Job1 and Job2
