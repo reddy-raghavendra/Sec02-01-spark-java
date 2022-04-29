@@ -224,7 +224,7 @@ public class MinimalPageRankNalla {
       // Get the maximum value using Combine transform which required comparator implemented class instance as a parameter
       PCollection<KV<Double, String>> maxRank = job3.apply(Combine.globally(Max.of(new RankedPageNalla())));
     // Change the KV pairs to String using toString of kv
-    PCollection<String> pColStringLists = job2out.apply(
+    PCollection<String> pColStringLists = maxRank.apply(
         MapElements.into(
             TypeDescriptors.strings()).via(
                 kvtoString -> kvtoString.toString()));

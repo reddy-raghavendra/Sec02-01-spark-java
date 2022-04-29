@@ -2,8 +2,11 @@ package edu.nwmsu.sec02grp1.nalla;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 
-public class RankedPageNalla implements Serializable {
+import org.apache.beam.sdk.values.KV;
+
+public class RankedPageNalla implements Serializable,Comparator<KV<Double,String>> {
     String voter;
     double rank = 1.0;
     ArrayList<VotingPageNalla> voterList = new ArrayList<>();
@@ -45,5 +48,17 @@ public class RankedPageNalla implements Serializable {
 
     public double getRank() {
         return this.rank;
+    }
+    @Override
+    public int compare(KV<Double, String> o1, KV<Double, String> o2) {
+        double rank1 = o1.getKey();
+        double rank2 = o2.getKey();
+        if (rank1 > rank2) {
+            return 1;
+        } else if(rank1 < rank2) {
+            return -1;
+        }else{
+            return 0;
+        }
     }
 }
