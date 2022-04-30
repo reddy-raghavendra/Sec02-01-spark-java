@@ -37,6 +37,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Filter;
@@ -44,6 +45,8 @@ import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.Max;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
@@ -129,7 +132,59 @@ public class MinimalPageRankNalla {
     }
   }
 
+  static class Job2Mapper extends DoFn<KV<String, RankedPageNalla>, KV<String, RankedPageNalla>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, RankedPageNalla> element,
+      OutputReceiver<KV<String, RankedPageNalla>> receiver) {
+      int votes = 0;
+      ArrayList<VotingPageNalla> voters = element.getValue().getVoterList();
+      if(voters instanceof Collection){
+        votes = ((Collection<VotingPageNalla>) voters).size();
+      }
+      for(VotingPageNalla vp: voters){
+        String pageName = vp.getVoterName();
+        double pageRank = vp.getPageRank();
+        String contributingPageName = element.getKey();
+        double contributingPageRank = element.getValue().getRank();
+        VotingPageNalla contributor = new VotingPageNalla(contributingPageName,votes,contributingPageRank);
+        ArrayList<VotingPageNalla> arr = new ArrayList<>();
+        arr.add(contributor);
+        receiver.output(KV.of(vp.getVoterName(), new RankedPageNalla(pageName, pageRank, arr)));        
+      }
+    }
+  }
+
+  static class Job2Updater extends DoFn<KV<String, Iterable<RankedPageNalla>>, KV<String, RankedPageNalla>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<RankedPageNalla>> element,
+      OutputReceiver<KV<String, RankedPageNalla>> receiver) {
+        Double dampingFactor = 0.85;
+        Double updatedRank = (1 - dampingFactor);
+        ArrayList<VotingPageNalla> newVoters = new ArrayList<>();
+        for(RankedPageNalla rankPage:element.getValue()){
+          if (rankPage != null) {
+            for(VotingPageNalla votingPage:rankPage.getVoterList()){
+              newVoters.add(votingPage);
+              updatedRank += (dampingFactor) * votingPage.getPageRank() / (double)votingPage.getContributorVotes();
+            }
+          }
+        }
+        receiver.output(KV.of(element.getKey(),new RankedPageNalla(element.getKey(), updatedRank, newVoters)));
+
+    }
+
+  }
+
+ 
+  static class Job3 extends DoFn<KV<String, RankedPageNalla>, KV<Double, String>>{
+    @ProcessElement
+     public void processElement(@Element KV<String, RankedPageNalla> element,
+      OutputReceiver<KV<Double, String>> receiver){
+        receiver.output(KV.of(element.getValue().getRank(),element.getKey()));
+    }
+  }
   public static void main(String[] args) {
+
 
     PipelineOptions options = PipelineOptionsFactory.create();
     Pipeline p = Pipeline.create(options);
@@ -147,19 +202,40 @@ public class MinimalPageRankNalla {
     PCollection<KV<String,String>> pColListMerged =  pColList.apply(Flatten.<KV<String,String>>pCollections());
 //group by key
   PCollection<KV<String,Iterable<String>>> pColGroupByKey = pColListMerged.apply(GroupByKey.create());
-// Change the KV pairs to String using toString of kv 
-    PCollection<String> pColStringLists = pColGroupByKey.apply(
-      MapElements.into(
-        TypeDescriptors.strings()
-      ).via(
-        kvtoString -> kvtoString.toString()
-      )
-    );
-//Write the output to the file 
-    pColStringLists.apply(TextIO.write().to("PageRank-nalla"));
+    // Convert to a custom Value object (RankedPage) in preparation for Job 2
+    PCollection<KV<String, RankedPageNalla>> job2in = pColGroupByKey.apply(ParDo.of(new Job1Finalizer()));
+
+    PCollection<KV<String, RankedPageNalla>> job2out = null; 
+    int iterations = 30;
+    for (int i = 1; i <= iterations; i++) {
+      // use job2in to calculate job2 out
+      PCollection<KV<String,RankedPageNalla>> job2Mapper = job2in.apply(ParDo.of(new Job2Mapper()));
+  
+      PCollection<KV<String,Iterable<RankedPageNalla>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
+  
+      job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+      // update job2in so it equals the new job2out
+      job2in = job2out;
+    }
+    // PColljob2in.apply(ParDo.of(new Job3()));
+      // Call job 3 to get the results in format <Rank(Double),Rank page name(String)>
+      PCollection<KV<Double, String>> job3 = job2out.apply(ParDo.of(new Job3()));
+
+      // Get the maximum value using Combine transform which required comparator implemented class instance as a parameter
+      PCollection<KV<Double, String>> maxRank = job3.apply(Combine.globally(Max.of(new RankedPageNalla())));
+    // Change the KV pairs to String using toString of kv
+    PCollection<String> pColStringLists = maxRank.apply(
+        MapElements.into(
+            TypeDescriptors.strings()).via(
+                kvtoString -> kvtoString.toString()));
+    // Write the output to the file
+
+
+    pColStringLists.apply(TextIO.write().to("PageRank-Nalla"));
 
     p.run().waitUntilFinish();
   }
+
 
   private static PCollection<KV<String,String>> nallaPcolLinks(Pipeline p, final String folderName, final String fileName) {
 // Fetching the data from the destination

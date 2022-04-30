@@ -10,7 +10,7 @@ import org.apache.beam.sdk.values.KV;
 public  class VotingPageReddy extends DoFn<KV<String,Iterable<String>>,KV<String,RankedPageReddy>> implements Serializable{
     String voterName;
     int contributorVotes;
-    double pageRank;
+    double pageRank = 1.0;
     public VotingPageReddy(String voterName,Integer contributorVotes2, double pageRank){
         this.voterName = voterName;
         this.contributorVotes = contributorVotes2;      
@@ -20,7 +20,7 @@ public  class VotingPageReddy extends DoFn<KV<String,Iterable<String>>,KV<String
     public VotingPageReddy(String voterName,Integer contributorVotes2){
         this.voterName = voterName;
         this.contributorVotes = contributorVotes2;      
-        this.pageRank = 1.0;  
+   
     }
     
     public String getVoterName() {

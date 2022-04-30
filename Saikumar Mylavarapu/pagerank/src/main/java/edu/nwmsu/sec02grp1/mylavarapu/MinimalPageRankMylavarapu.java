@@ -53,6 +53,57 @@ import org.apache.beam.sdk.values.TypeDescriptor;
 
 public class MinimalPageRankMylavarapu {
 
+static class Job2Mapper extends DoFn<KV<String, RankedPageMylavarapu>, KV<String, RankedPageMylavarapu>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, RankedPageMylavarapu> element,
+      OutputReceiver<KV<String, RankedPageMylavarapu>> receiver) {
+      int votes = 0;
+      ArrayList<VotingPageMylavarapu> voters = element.getValue().getVoterList();
+      if(voters instanceof Collection){
+        votes = ((Collection<VotingPageMylavarapu>) voters).size();
+      }
+      for(VotingPageMylavarapu vp: voters){
+        String pageName = vp.getVoterName();
+        double pageRank = vp.getPageRank();
+        String contributingPageName = element.getKey();
+        double contributingPageRank = element.getValue().getRank();
+        VotingPageMylavarapu contributor = new VotingPageMylavarapu(contributingPageName,votes,contributingPageRank);
+        ArrayList<VotingPageMylavarapu> arr = new ArrayList<>();
+        arr.add(contributor);
+        receiver.output(KV.of(vp.getVoterName(), new RankedPageMylavarapu(pageName, pageRank, arr)));        
+      }
+    }
+  }
+
+  static class Job3 extends DoFn<KV<String, RankedPageMylavarapu>, KV<Double, String>>{
+    @ProcessElement
+     public void processElement(@Element KV<String, RankedPageMylavarapu> element,
+      OutputReceiver<KV<Double, String>> receiver){
+        receiver.output(KV.of(element.getValue().getRank(),element.getKey()));
+    }
+  }
+  static class Job2Updater extends DoFn<KV<String, Iterable<RankedPageMylavarapu>>, KV<String, RankedPageMylavarapu>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<RankedPageMylavarapu>> element,
+      OutputReceiver<KV<String, RankedPageMylavarapu>> receiver) {
+        Double dampingFactor = 0.85;
+        Double updatedRank = (1 - dampingFactor);
+        ArrayList<VotingPageMylavarapu> newVoters = new ArrayList<>();
+        for(RankedPageMylavarapu rankPage:element.getValue()){
+          if (rankPage != null) {
+            for(VotingPageMylavarapu votingPage:rankPage.getVoterList()){
+              newVoters.add(votingPage);
+              updatedRank += (dampingFactor) * votingPage.getPageRank() / (double)votingPage.getContributorVotes();
+            }
+          }
+        }
+        receiver.output(KV.of(element.getKey(),new RankedPageMylavarapu(element.getKey(), updatedRank, newVoters)));
+
+    }
+
+  }
+
+  
   static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankedPageMylavarapu>> {
     @ProcessElement
     public void processElement(@Element KV<String, Iterable<String>> element,
