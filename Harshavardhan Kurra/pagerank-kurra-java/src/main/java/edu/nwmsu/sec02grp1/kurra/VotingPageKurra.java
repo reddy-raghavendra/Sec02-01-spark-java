@@ -10,10 +10,19 @@ import org.apache.beam.sdk.values.KV;
 public  class VotingPageKurra extends DoFn<KV<String,Iterable<String>>,KV<String,RankedPageKurra>> implements Serializable{
     String voterName;
     int contributorVotes;
+    double pageRank = 1.0;
+    public VotingPageKurra(String voterName,Integer contributorVotes2, double pageRank){
+        this.voterName = voterName;
+        this.contributorVotes = contributorVotes2;      
+        this.pageRank = pageRank;  
+    }
+
     public VotingPageKurra(String voterName,Integer contributorVotes2){
         this.voterName = voterName;
-        this.contributorVotes = contributorVotes2;        
+        this.contributorVotes = contributorVotes2;      
+   
     }
+    
     public String getVoterName() {
         return voterName;
     }
@@ -28,7 +37,14 @@ public  class VotingPageKurra extends DoFn<KV<String,Iterable<String>>,KV<String
     }
     @Override
     public String toString() {
-        return "contributorVotes=" + contributorVotes + ", voterName=" + voterName;
+        return "voterName = "+ voterName +", Page rank = "+this.pageRank +" ContributorVotes = " + contributorVotes;
+    }
+
+    public double getPageRank() {
+        return this.pageRank;
+    }
+    public void setPageRank(double pageRank){
+        this.pageRank = pageRank;
     }
 
 

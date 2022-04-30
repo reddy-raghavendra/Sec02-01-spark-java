@@ -129,6 +129,57 @@ public class MinimalPageRankKurra{
     }
   }
 
+  static class Job2Mapper extends DoFn<KV<String, RankedPageKurra>, KV<String, RankedPageKurra>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, RankedPageKurra> element,
+      OutputReceiver<KV<String, RankedPageKurra>> receiver) {
+      int votes = 0;
+      ArrayList<VotingPageKurra> voters = element.getValue().getVoterList();
+      if(voters instanceof Collection){
+        votes = ((Collection<VotingPageKurra>) voters).size();
+      }
+      for(VotingPageKurra vp: voters){
+        String pageName = vp.getVoterName();
+        double pageRank = vp.getPageRank();
+        String contributingPageName = element.getKey();
+        double contributingPageRank = element.getValue().getRank();
+        VotingPageKurra contributor = new VotingPageKurra(contributingPageName,votes,contributingPageRank);
+        ArrayList<VotingPageKurra> arr = new ArrayList<>();
+        arr.add(contributor);
+        receiver.output(KV.of(vp.getVoterName(), new RankedPageKurra(pageName, pageRank, arr)));        
+      }
+    }
+  }
+
+  static class Job2Updater extends DoFn<KV<String, Iterable<RankedPageKurra>>, KV<String, RankedPageKurra>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<RankedPageKurra>> element,
+      OutputReceiver<KV<String, RankedPageKurra>> receiver) {
+        Double dampingFactor = 0.85;
+        Double updatedRank = (1 - dampingFactor);
+        ArrayList<VotingPageKurra> newVoters = new ArrayList<>();
+        for(RankedPageKurra rankPage:element.getValue()){
+          if (rankPage != null) {
+            for(VotingPageKurra votingPage:rankPage.getVoterList()){
+              newVoters.add(votingPage);
+              updatedRank += (dampingFactor) * votingPage.getPageRank() / (double)votingPage.getContributorVotes();
+            }
+          }
+        }
+        receiver.output(KV.of(element.getKey(),new RankedPageKurra(element.getKey(), updatedRank, newVoters)));
+
+    }
+
+  }
+
+  static class Job3 extends DoFn<KV<String, RankedPageKurra>, KV<Double, String>>{
+    @ProcessElement
+     public void processElement(@Element KV<String, RankedPageKurra> element,
+      OutputReceiver<KV<Double, String>> receiver){
+        receiver.output(KV.of(element.getValue().getRank(),element.getKey()));
+    }
+  }
+
   public static void main(String[] args) {
 
     PipelineOptions options = PipelineOptionsFactory.create();
