@@ -38,6 +38,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Filter;
@@ -45,6 +46,7 @@ import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.Max;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
@@ -94,7 +96,7 @@ import io.grpc.netty.shaded.io.netty.handler.pcap.PcapWriteHandler;
  * file service.
  */
 
-public class MinimalPageRankNallapati{
+public class MinimalPageRankNallapati {
   // DEFINE DOFNS
   // ==================================================================
   // You can make your pipeline assembly code less verbose by defining
@@ -132,21 +134,21 @@ public class MinimalPageRankNallapati{
   static class Job2Mapper extends DoFn<KV<String, RankedPageNallapati>, KV<String, RankedPageNallapati>> {
     @ProcessElement
     public void processElement(@Element KV<String, RankedPageNallapati> element,
-      OutputReceiver<KV<String, RankedPageNallapati>> receiver) {
+        OutputReceiver<KV<String, RankedPageNallapati>> receiver) {
       int votes = 0;
       ArrayList<VotingPageNallapati> voters = element.getValue().getVoterList();
-      if(voters instanceof Collection){
+      if (voters instanceof Collection) {
         votes = ((Collection<VotingPageNallapati>) voters).size();
       }
-      for(VotingPageNallapati vp: voters){
+      for (VotingPageNallapati vp : voters) {
         String pageName = vp.getVoterName();
         double pageRank = vp.getPageRank();
         String contributingPageName = element.getKey();
         double contributingPageRank = element.getValue().getRank();
-        VotingPageNallapati contributor = new VotingPageNallapati(contributingPageName,votes,contributingPageRank);
+        VotingPageNallapati contributor = new VotingPageNallapati(contributingPageName, votes, contributingPageRank);
         ArrayList<VotingPageNallapati> arr = new ArrayList<>();
         arr.add(contributor);
-        receiver.output(KV.of(vp.getVoterName(), new RankedPageNallapati(pageName, pageRank, arr)));        
+        receiver.output(KV.of(vp.getVoterName(), new RankedPageNallapati(pageName, pageRank, arr)));
       }
     }
   }
@@ -154,36 +156,35 @@ public class MinimalPageRankNallapati{
   static class Job2Updater extends DoFn<KV<String, Iterable<RankedPageNallapati>>, KV<String, RankedPageNallapati>> {
     @ProcessElement
     public void processElement(@Element KV<String, Iterable<RankedPageNallapati>> element,
-      OutputReceiver<KV<String, RankedPageNallapati>> receiver) {
-        Double dampingFactor = 0.85;
-        Double updatedRank = (1 - dampingFactor);
-        ArrayList<VotingPageNallapati> newVoters = new ArrayList<>();
-        for(RankedPageNallapati rankPage:element.getValue()){
-          if (rankPage != null) {
-            for(VotingPageNallapati votingPage:rankPage.getVoterList()){
-              newVoters.add(votingPage);
-              updatedRank += (dampingFactor) * votingPage.getPageRank() / (double)votingPage.getContributorVotes();
-              // newVoters.add(new VotingPageNallapati(votingPage.getVoterName(),votingPage.getContributorVotes(),updatedRank));
-            }
+        OutputReceiver<KV<String, RankedPageNallapati>> receiver) {
+      Double dampingFactor = 0.85;
+      Double updatedRank = (1 - dampingFactor);
+      ArrayList<VotingPageNallapati> newVoters = new ArrayList<>();
+      for (RankedPageNallapati rankPage : element.getValue()) {
+        if (rankPage != null) {
+          for (VotingPageNallapati votingPage : rankPage.getVoterList()) {
+            newVoters.add(votingPage);
+            updatedRank += (dampingFactor) * votingPage.getPageRank() / (double) votingPage.getContributorVotes();
           }
         }
-        receiver.output(KV.of(element.getKey(),new RankedPageNallapati(element.getKey(), updatedRank, newVoters)));
+      }
+      receiver.output(KV.of(element.getKey(), new RankedPageNallapati(element.getKey(), updatedRank, newVoters)));
 
     }
 
   }
 
-  // static class Job2 extends DoFn<KV<String, RankedPageNallapati>, KV<String, RankedPageNallapati>>{
-  //   @ProcessElement
-  //    public void processElement(@Element KV<String, RankedPageNallapati> element,
-  //     OutputReceiver<KV<String, RankedPageNallapati>> receiver){
-  //       PCollection<KV<String,RankedPageNallapati>> job2Mapper = element.getKey().apply(ParDo.of(new Job2Mapper()));
 
-  //       PCollection<KV<String,Iterable<RankedPageNallapati>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
-    
-  //       PCollection<KV<String, RankedPageNallapati>> job2Updater = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
-  //   }
-  // }
+
+  static class Job3 extends DoFn<KV<String, RankedPageNallapati>, KV<Double, String>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, RankedPageNallapati> element,
+        OutputReceiver<KV<Double, String>> receiver) {
+      double maxRank = Integer.MIN_VALUE;
+      receiver.output(KV.of(element.getValue().getRank(), element.getKey()));
+    }
+  }
+
   public static void main(String[] args) {
 
     PipelineOptions options = PipelineOptionsFactory.create();
@@ -205,65 +206,30 @@ public class MinimalPageRankNallapati{
     PCollection<KV<String, Iterable<String>>> pColGroupByKey = pColListMerged.apply(GroupByKey.create());
     // Convert to a custom Value object (RankedPage) in preparation for Job 2
     PCollection<KV<String, RankedPageNallapati>> job2in = pColGroupByKey.apply(ParDo.of(new Job1Finalizer()));
-  //Job 1 results 
-  // KV{java.md, java.md<1.0,[[voterName = README.md, Page rank = 1.0 ContributorVotes = 1]]>}
-  // KV{python.md, python.md<1.0,[[voterName = README.md, Page rank = 1.0 ContributorVotes = 1]]>}
-  // KV{readme.md, readme.md<1.0,[[voterName = go.md, Page rank = 1.0 ContributorVotes = 3], [voterName = java.md, Page rank = 1.0 ContributorVotes = 3], [voterName = python.md, Page rank = 1.0 ContributorVotes = 3]]>}
-  // KV{go.md, go.md<1.0,[[voterName = README.md, Page rank = 1.0 ContributorVotes = 1]]>}
-    PCollection<KV<String,RankedPageNallapati>> job2Mapper = job2in.apply(ParDo.of(new Job2Mapper()));
-  //Job 2 mapper results 
-  // KV{README.md, README.md<1.0,[voterName = go.md, Page rank = 1.0 ContributorVotes = 1]>}
-  // KV{README.md, README.md<1.0,[voterName = python.md, Page rank = 1.0 ContributorVotes = 1]>}
-  // KV{README.md, README.md<1.0,[voterName = java.md, Page rank = 1.0 ContributorVotes = 1]>}  
-  // KV{go.md, go.md<1.0,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
-  // KV{python.md, python.md<1.0,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
-  // KV{java.md, java.md<1.0,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
 
-  PCollection<KV<String, RankedPageNallapati>> job2out = null; 
-  PCollection<KV<String,Iterable<RankedPageNallapati>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
-    
-  job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+    PCollection<KV<String, RankedPageNallapati>> job2out = null;
+    int iterations = 40;
+    for (int i = 1; i <= iterations; i++) {
+      // use job2in to calculate job2 out
+      PCollection<KV<String, RankedPageNallapati>> job2Mapper = job2in.apply(ParDo.of(new Job2Mapper()));
 
-  // Job2 results 1st iteration
-  // KV{README.md, README.md<2.7,[voterName = java.md, Page rank = 1.0 ContributorVotes = 1, voterName = python.md, Page rank = 1.0 ContributorVotes = 1, voterName = go.md, Page rank = 1.0 ContributorVotes = 1]>}
-  // KV{java.md, java.md<0.43333333333333335,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
-  // KV{go.md, go.md<0.43333333333333335,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
-  // KV{python.md, python.md<0.43333333333333335,[voterName = readme.md, Page rank = 1.0 ContributorVotes = 3]>}
-  job2MapperGrpByKey = job2out.apply(GroupByKey.create());
-    
-  job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
-  // Job2 results 1st iteration
-  // KV{java.md, java.md<0.2727777777777778,[voterName = readme.md, Page rank = 0.2727777777777778 ContributorVotes = 3]>}
-  // KV{go.md, go.md<0.2727777777777778,[voterName = readme.md, Page rank = 0.2727777777777778 ContributorVotes = 3]>}
-  // KV{python.md, python.md<0.2727777777777778,[voterName = readme.md, Page rank = 0.2727777777777778 ContributorVotes = 3]>}
-  // KV{README.md, README.md<4.8675,[voterName = java.md, Page rank = 1.0 ContributorVotes = 1, voterName = python.md, Page rank = 2.5725 ContributorVotes = 1, voterName = go.md, Page rank = 4.8675 ContributorVotes = 1]>}
-  job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
-  job2MapperGrpByKey = job2out.apply(GroupByKey.create());    
-  job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));   
-    // PCollection<KV<String, RankedPageNallapati>> job2out = null; 
-    // int iterations = 40;
-    // for (int i = 1; i <= iterations; i++) {
-    //   // use job2in to calculate job2 out
-    //   PCollection<KV<String, RankedPageNallapati>> job2in = pColGroupByKey.apply(ParDo.of(new Job1Finalizer()));
+      PCollection<KV<String, Iterable<RankedPageNallapati>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
 
-    //   PCollection<KV<String,RankedPageNallapati>> job2Mapper = job2in.apply(ParDo.of(new Job2Mapper()));
-  
-    //   PCollection<KV<String,Iterable<RankedPageNallapati>>> job2MapperGrpByKey = job2Mapper.apply(GroupByKey.create());
-  
-    //    job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
-    //   // update job2in so it equals the new job2out
-    //     job2in = job2out;
-    // }
-   
-   
+      job2out = job2MapperGrpByKey.apply(ParDo.of(new Job2Updater()));
+      // update job2in so it equals the new job2out
+      job2in = job2out;
+    }
 
+    PCollection<KV<Double, String>> job3 = job2out.apply(ParDo.of(new Job3()));
+
+    PCollection<KV<Double, String>> maxRank = job3.apply(Combine.globally(Max.of(new RankedPageNallapati())));
+    // Combine.globally(Max.of(job3));
     // Change the KV pairs to String using toString of kv
-    PCollection<String> pColStringLists = job2out.apply(
+    PCollection<String> pColStringLists = maxRank.apply(
         MapElements.into(
             TypeDescriptors.strings()).via(
                 kvtoString -> kvtoString.toString()));
     // Write the output to the file
-
 
     pColStringLists.apply(TextIO.write().to("PageRank-Nallapati"));
 
